@@ -11,7 +11,10 @@ async def hello(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(f'Hello {update.effective_user.first_name}')
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text('This is a help message. Here you can find information about available commands.')
+    await update.message.reply_text(
+        f'To find the nearest musollah:\n\n'
+        f'Tap the attachment icon (paperclip), select "Location", and send your current location.'
+        )
 
 async def location_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user_location = update.message.location
