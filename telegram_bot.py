@@ -1,8 +1,10 @@
 import os
+import logging
 from dotenv import load_dotenv
 from telegram import Update, constants
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, MessageHandler, filters
 from geopy.distance import geodesic
+from health_server import start_health_server
 
 # Load environment variables from .env file
 load_dotenv()
@@ -249,11 +251,21 @@ async def location_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     )
 
 def main():
+    # Configure logging
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
+    
     # Get token from environment variable
     token = os.getenv("TELEGRAM_BOT_TOKEN")
     if not token:
-        print("Error: TELEGRAM_BOT_TOKEN environment variable not set")
+        logging.error("Error: TELEGRAM_BOT_TOKEN environment variable not set")
         return
+    
+    # Start the health check server on port 8080
+    health_server = start_health_server(port=8080)
+    logging.info("Health check server started on port 8080 (endpoint: /ping)")
         
     app = ApplicationBuilder().token(token).build()
 
@@ -261,9 +273,13 @@ def main():
     app.add_handler(CommandHandler("help", help_command))
     app.add_handler(MessageHandler(filters.LOCATION, location_handler))
 
-    print("Starting up application...")
+    logging.info("Starting Telegram bot...")
     
-    app.run_polling()
+    try:
+        app.run_polling()
+    except KeyboardInterrupt:
+        logging.info("Stopping application...")
+        health_server.shutdown()
 
 if __name__ == "__main__":
     main()
