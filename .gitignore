@@ -3,6 +3,11 @@ venv/
 env/
 .env/
 
+# Environment variables
+.env
+# But keep the example file
+!.env.example
+
 # Python cache files
 __pycache__/
 *.py[cod]

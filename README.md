@@ -6,7 +6,10 @@
 
 1. Make sure you have Python 3.9 or newer installed
 2. Create a new bot and get a token from [@BotFather](https://t.me/BotFather) on Telegram
-3. Replace `YOUR_TOKEN` in the `telegram_bot.py` file with your actual bot token
+3. Create a `.env` file in the project root directory with your bot token (you can use the provided `.env.example` as a template):
+   ```
+   TELEGRAM_BOT_TOKEN=your_bot_token_here
+   ```
 4. Make the setup script executable and run it:
    ```
    chmod +x setup.sh
@@ -36,11 +39,26 @@
    pip install -r requirements.txt
    ```
 4. Create a new bot and get a token from [@BotFather](https://t.me/BotFather) on Telegram
-5. Replace `YOUR_TOKEN` in the `telegram_bot.py` file with your actual bot token
+5. Create a `.env` file in the project root directory with your bot token (you can use the provided `.env.example` as a template):
+   ```
+   TELEGRAM_BOT_TOKEN=your_bot_token_here
+   ```
 6. Run the bot:
    ```
    python telegram_bot.py
    ```
+
+## Features
+
+### Commands
+- `/hello`: Greets the user with their first name
+- `/help`: Displays help information about available commands
+
+### Location Sharing
+The bot can receive location data shared by users and find the closest predefined location from its database. When a user shares their location, the bot will:
+1. Calculate the distance to each predefined location
+2. Identify the closest location
+3. Respond with the name of the closest location and the distance in kilometers
 
 ## Dependencies
 
@@ -48,5 +66,7 @@ This bot requires the following dependencies:
 
 - `python-telegram-bot` (v22.3): The main library for Telegram bot functionality
 - `pytz`: Required for timezone handling with the APScheduler component used by python-telegram-bot
+- `geopy`: Used for calculating distances between geographical coordinates
+- `python-dotenv`: Used for loading environment variables from a .env file
 
 All dependencies are listed in the `requirements.txt` file.

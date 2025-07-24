@@ -22,13 +22,26 @@ source venv/bin/activate
 echo "Installing dependencies..."
 pip install -r requirements.txt
 
-if [ $? -eq 0 ]; then
-    echo ""
-    echo "Setup complete! You can now run the bot with:"
-    echo "source venv/bin/activate  # If not already activated"
-    echo "python telegram_bot.py"
-else
+if [ $? -ne 0 ]; then
     echo ""
     echo "Setup encountered issues. Please fix the dependencies before running the bot."
     exit 1
 fi
+
+# Check for .env file and create it if it doesn't exist
+if [ ! -f ".env" ]; then
+    echo ""
+    echo "Creating .env file for bot configuration..."
+    echo "Please enter your Telegram Bot Token (from @BotFather):"
+    read -r token
+    echo "TELEGRAM_BOT_TOKEN=$token" > .env
+    echo ".env file created successfully!"
+else
+    echo ""
+    echo ".env file already exists. If you need to update your token, edit the .env file directly."
+fi
+
+echo ""
+echo "Setup complete! You can now run the bot with:"
+echo "source venv/bin/activate  # If not already activated"
+echo "python telegram_bot.py"
