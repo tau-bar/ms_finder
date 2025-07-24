@@ -54,12 +54,6 @@
 - `/hello`: Greets the user with their first name
 - `/help`: Displays help information about available commands
 
-### Health Check Endpoint
-The bot includes a health check HTTP server that runs on port 8080:
-- `/ping`: Returns "OK" with a 200 status code when the server is running properly
-
-This endpoint can be used for monitoring the health of the bot service.
-
 ### Location Sharing
 The bot can receive location data shared by users and find the closest predefined location from its database. When a user shares their location, the bot will:
 1. Calculate the distance to each predefined location
