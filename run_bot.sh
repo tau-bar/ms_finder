@@ -11,5 +11,5 @@ if [ ! -f ".env" ]; then
     exit 1
 fi
 
-# Run the bot
-python3 telegram_bot.py
+# Run the bot with auto-restart on code changes
+watchmedo auto-restart --patterns="*.py" --recursive -- python3 telegram_bot.py
