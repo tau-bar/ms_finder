@@ -53,13 +53,12 @@ async def location_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         parse_mode=constants.ParseMode.HTML
     )
 
-def main():
-    # Get token from environment variable
+def create_bot_app():
     token = os.getenv("TELEGRAM_BOT_TOKEN")
     if not token:
-        print("Error: TELEGRAM_BOT_TOKEN environment variable not set. Please set it in your .env file.")
-        return
-        
+        print("Error: TELEGRAM_BOT_TOKEN environment variable not set.")
+        return None
+
     app = ApplicationBuilder().token(token).build()
 
     app.add_handler(CommandHandler("hello", hello))
@@ -67,9 +66,11 @@ def main():
     app.add_handler(CommandHandler("help", help_command))
     app.add_handler(MessageHandler(filters.LOCATION, location_handler))
 
-    print("Starting up application...")
-    
-    app.run_polling()
+    return app
+
+bot_app = create_bot_app()
 
 if __name__ == "__main__":
-    main()
+    import asyncio
+    bot_app = create_bot_app()
+    asyncio.run(bot_app.run_polling())

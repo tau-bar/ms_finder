@@ -1,12 +1,14 @@
 from fastapi import FastAPI
-from telegram_bot import main  # Import your bot's main function
+import asyncio
+from telegram_bot import bot_app
 
 app = FastAPI()
 
-@app.get("/health")
-def health_check():
-    return {"status": "ok"}
-
 @app.on_event("startup")
 async def start_bot():
-    main()  # Start the bot polling when the server starts
+    asyncio.create_task(bot_app.run_polling())
+    print("Telegram bot started!")
+
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
