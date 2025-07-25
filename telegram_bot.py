@@ -5,14 +5,13 @@ from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, Messa
 from geopy.distance import geodesic
 from musollah_locations import locations
 
-# Load environment variables from .env file
 load_dotenv()
 
 async def hello(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(f'Hello {update.effective_user.first_name}')
 
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-   await update.message.reply_text(
+    await update.message.reply_text(
         "🕌 Ready to help you find prayer spaces!\n\n"
         "📍 Send your location to get started:\n"
         "• Tap the attachment icon (📎)\n"
@@ -25,7 +24,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     await update.message.reply_text(
         f'To find the nearest musollah 🕌:\n\n'
         f'Tap the attachment icon (paperclip), select "Location", and send your current location 📍.'
-        )
+    )
 
 async def location_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user_location = update.message.location
@@ -68,9 +67,10 @@ def create_bot_app():
 
     return app
 
-bot_app = create_bot_app()
-
+# For local testing only
 if __name__ == "__main__":
     import asyncio
     bot_app = create_bot_app()
-    asyncio.run(bot_app.run_polling())
+    if bot_app:
+        print("Starting bot locally...")
+        asyncio.run(bot_app.run_polling())
