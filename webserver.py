@@ -42,7 +42,7 @@ async def startup_event():
             
             logger.info("Bot application initialized and started successfully")
             
-            webhook_url = os.getenv(PROD_URL) + "webhook"
+            webhook_url = PROD_URL + "webhook"
             logger.info(f"Using webhook URL: {webhook_url}")
             
             await bot_app.bot.set_webhook(url=webhook_url)
