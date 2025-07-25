@@ -42,7 +42,7 @@ async def startup_event():
             
             logger.info("Bot application initialized and started successfully")
             
-            webhook_url = os.getenv(PROD_URL + "webhook")
+            webhook_url = os.getenv(PROD_URL) + "webhook"
             logger.info(f"Using webhook URL: {webhook_url}")
             
             await bot_app.bot.set_webhook(url=webhook_url)
@@ -106,7 +106,7 @@ async def root():
         "message": "Musollah Finder Bot is running!", 
         "status": "active",
         "bot_ready": bot_app is not None,
-        "timestamp": datetime.now().isoformat()
+        "timestamp": datetime.now()
     }
 
 @app.get("/health")
@@ -115,7 +115,7 @@ async def health():
     return {
         "status": "ok", 
         "bot_status": bot_status,
-        "timestamp": datetime.now().isoformat()
+        "timestamp": datetime.now()
     }
 
 @app.get("/webhook-info")
@@ -160,7 +160,7 @@ async def test_bot():
 @app.get("/ping")
 async def ping():
     """Simple ping endpoint for keep-alive"""
-    return {"ping": "pong", "timestamp": datetime.now().isoformat()}
+    return {"ping": "pong", "timestamp": datetime.now()}
 
 if __name__ == "__main__":
     import uvicorn
