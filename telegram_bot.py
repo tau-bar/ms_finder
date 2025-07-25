@@ -4,6 +4,7 @@ from telegram import Update, constants
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, MessageHandler, filters
 from geopy.distance import geodesic
 from musollah_locations import locations
+from datetime import datetime
 
 load_dotenv()
 
@@ -53,27 +54,34 @@ async def location_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     )
 
 def create_bot_app():
-    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    environment = os.getenv("ENVIRONMENT", "dev").lower()
+    
+    if environment == "prod":
+        token = os.getenv("TELEGRAM_BOT_TOKEN_PROD")
+    else:
+        token = os.getenv("TELEGRAM_BOT_TOKEN_DEV")
+    
     if not token:
-        print("Error: TELEGRAM_BOT_TOKEN environment variable not set.")
+        print(f"Error: TELEGRAM_BOT_TOKEN_{environment.upper()} environment variable not set.")
         return None
 
-    # Build application for webhook mode
     app = ApplicationBuilder().token(token).build()
 
-    # Add handlers
     app.add_handler(CommandHandler("hello", hello))
     app.add_handler(CommandHandler("start", start_command))
     app.add_handler(CommandHandler("help", help_command))
     app.add_handler(MessageHandler(filters.LOCATION, location_handler))
 
-    print(f"Bot app created with {len(app.handlers)} handler groups")
     return app
 
 # For local testing only
 if __name__ == "__main__":
-    import asyncio
     bot_app = create_bot_app()
     if bot_app:
-        print("Starting bot locally...")
-        asyncio.run(bot_app.run_polling())
+        print(f"Bot running at {datetime.now()}...")
+        try:
+            bot_app.run_polling()
+        except KeyboardInterrupt:
+            print("Bot stopped.")
+    else:
+        print("Failed to create bot app... Check environment variables and code logic.")

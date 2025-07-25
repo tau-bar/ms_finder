@@ -6,13 +6,16 @@ import logging
 import asyncio
 import aiohttp
 from datetime import datetime
+from dotenv import load_dotenv
 
-# Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
 bot_app = None
+
+load_dotenv()
+PROD_URL = os.getenv("PROD_URL")
 
 async def keep_alive():
     """Keep the service alive by making periodic requests"""
@@ -20,7 +23,7 @@ async def keep_alive():
         try:
             await asyncio.sleep(840)  # Wait 14 minutes
             async with aiohttp.ClientSession() as session:
-                async with session.get("https://ms-finder-tele-bot.onrender.com/health") as response:
+                async with session.get(PROD_URL + "health") as response:
                     logger.info(f"Keep-alive ping: {response.status} at {datetime.now()}")
         except Exception as e:
             logger.error(f"Keep-alive error: {e}")
@@ -34,27 +37,20 @@ async def startup_event():
         bot_app = create_bot_app()
         
         if bot_app:
-            # Initialize the application
             await bot_app.initialize()
-            
-            # Start the application (this processes updates)
             await bot_app.start()
             
             logger.info("Bot application initialized and started successfully")
             
-            # Get the webhook URL
-            webhook_url = os.getenv("WEBHOOK_URL", "https://ms-finder-tele-bot.onrender.com/webhook")
+            webhook_url = os.getenv(PROD_URL + "webhook")
             logger.info(f"Using webhook URL: {webhook_url}")
             
-            # Set webhook
             await bot_app.bot.set_webhook(url=webhook_url)
             logger.info(f"Webhook set successfully")
             
-            # Verify webhook
             webhook_info = await bot_app.bot.get_webhook_info()
             logger.info(f"Webhook verification - URL: {webhook_info.url}, Pending: {webhook_info.pending_update_count}")
             
-            # Start keep-alive task
             asyncio.create_task(keep_alive())
             logger.info("Keep-alive task started")
             
@@ -89,7 +85,6 @@ async def webhook(request: Request):
             update = Update.de_json(update_data, bot_app.bot)
             logger.info(f"Parsed update: {update.update_id}")
             
-            # Process the update directly with error handling
             try:
                 await bot_app.process_update(update)
                 logger.info(f"Successfully processed update {update.update_id}")
