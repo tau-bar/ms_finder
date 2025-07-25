@@ -58,13 +58,16 @@ def create_bot_app():
         print("Error: TELEGRAM_BOT_TOKEN environment variable not set.")
         return None
 
+    # Build application for webhook mode
     app = ApplicationBuilder().token(token).build()
 
+    # Add handlers
     app.add_handler(CommandHandler("hello", hello))
     app.add_handler(CommandHandler("start", start_command))
     app.add_handler(CommandHandler("help", help_command))
     app.add_handler(MessageHandler(filters.LOCATION, location_handler))
 
+    print(f"Bot app created with {len(app.handlers)} handler groups")
     return app
 
 # For local testing only
