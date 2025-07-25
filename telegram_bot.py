@@ -11,10 +11,20 @@ load_dotenv()
 async def hello(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(f'Hello {update.effective_user.first_name}')
 
+async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+   await update.message.reply_text(
+        "🕌 Ready to help you find prayer spaces!\n\n"
+        "📍 Send your location to get started:\n"
+        "• Tap the attachment icon (📎)\n"
+        "• Select \"Location\"\n"
+        "• Share your current location\n\n"
+        "I'll find the nearest musollah with directions! 🧭"
+    )
+
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(
-        f'To find the nearest musollah:\n\n'
-        f'Tap the attachment icon (paperclip), select "Location", and send your current location.'
+        f'To find the nearest musollah 🕌:\n\n'
+        f'Tap the attachment icon (paperclip), select "Location", and send your current location 📍.'
         )
 
 async def location_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -53,6 +63,7 @@ def main():
     app = ApplicationBuilder().token(token).build()
 
     app.add_handler(CommandHandler("hello", hello))
+    app.add_handler(CommandHandler("start", start_command))
     app.add_handler(CommandHandler("help", help_command))
     app.add_handler(MessageHandler(filters.LOCATION, location_handler))
 
