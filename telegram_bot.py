@@ -90,7 +90,8 @@ def create_bot_app():
     app.add_handler(CommandHandler("hello", hello))
     app.add_handler(CommandHandler("start", start_command))
     app.add_handler(CommandHandler("help", help_command))
-    app.add_handler(MessageHandler(filters.LOCATION, location_pindrop_handler, location_postal_handler))
+    app.add_handler(CommandHandler("help", location_postal_handler))
+    app.add_handler(MessageHandler(filters.LOCATION, location_pindrop_handler))
 
     return app
 
