@@ -5,4 +5,5 @@ available_commands:
     1. start - Get started with finding nearby prayer spaces
     2. help - Learn how to use the bot to find musollah locations
     3. hello - Get a personalized greeting from the bot
+    4. location - Enter a postal code to get the nearest musollah
 
