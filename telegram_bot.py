@@ -7,6 +7,9 @@ from geopy.distance import geodesic
 from datetime import datetime
 from sheets_service import fetch_locations
 from constants import CMD_HELLO, CMD_START, CMD_HELP, CMD_LOCATION
+import psycopg2
+from psycopg2.extras import execute_values
+from database_service import init_database, log_user_to_postgres
 
 load_dotenv()
 
@@ -14,6 +17,8 @@ async def hello(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(f'Hello {update.effective_user.first_name}')
 
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    user = update.effective_user
+    log_user_to_postgres(user)
     await update.message.reply_text(
         "🕌 Ready to help you find prayer spaces!\n\n"
         "📍 Send your location to get started:\n"
@@ -51,14 +56,19 @@ def get_nearest_musollah(update, lat, lon):
     if "google_maps" in closest and closest["google_maps"]:
         gmaps_link = closest["google_maps"]
     else:
-        gmaps_link = f'https://www.google.com/maps/dir/?api=1&destination={closest["name"].replace(" ", "+")}@{closest["lat"]},{closest["lon"]}'
+        gmaps_link = f'https://www.google.com/maps/search/?api=1&destination={closest["name"].replace(" ", "+")}@{closest["lat"]},{closest["lon"]}'
+
+    navigate_text = f'<b>Navigate:</b> <a href="{gmaps_link}">Open in Google Maps</a>' if gmaps_link else ''
+
+    details = closest.get("details")
+    details_text = f'<b>Additional Info:</b>\n{details}\n\n' if details else ''
 
     return update.message.reply_text(
         f'<b>{closest["name"]}</b>\n'
         f'<b>Distance:</b> {distance:.2f} kilometers\n\n'
         f'<b>Directions:</b>\n{closest["directions"]}\n\n'
-        f'<b>Additional Info:</b>\n{closest["details"]}\n\n'
-        f'<b>Navigate:</b> <a href="{gmaps_link}">Open in Google Maps</a>',
+        f'{details_text}'
+        f'{navigate_text}',
         parse_mode=constants.ParseMode.HTML
     )
 
@@ -103,6 +113,8 @@ def create_bot_app():
         return None
 
     app = ApplicationBuilder().token(token).build()
+
+    init_database()
 
     app.add_handler(CommandHandler(CMD_HELLO, hello))
     app.add_handler(CommandHandler(CMD_START, start_command))

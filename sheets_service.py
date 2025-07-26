@@ -2,6 +2,7 @@ import os
 from typing import List, Dict, Any
 from googleapiclient.discovery import build
 from dotenv import load_dotenv
+from datetime import datetime
 
 # Load environment variables
 load_dotenv()
@@ -9,7 +10,7 @@ load_dotenv()
 # Environment variables
 SPREADSHEET_ID = os.getenv('GOOGLE_SHEETS_SPREADSHEET_ID')
 API_KEY = os.getenv('GOOGLE_SHEETS_API_KEY')
-RANGE_NAME = os.getenv('GOOGLE_SHEETS_RANGE', 'Sheet1')
+LOCATIONS_RANGE_NAME = os.getenv('GOOGLE_SHEETS_RANGE', 'locations')
 
 def fetch_locations() -> List[Dict[str, Any]]:
     """Fetch musollah locations from Google Sheets using API key.
@@ -30,7 +31,7 @@ def fetch_locations() -> List[Dict[str, Any]]:
         # Call the Sheets API
         sheet = service.spreadsheets()
         result = sheet.values().get(spreadsheetId=SPREADSHEET_ID,
-                                   range=RANGE_NAME).execute()
+                                   range=LOCATIONS_RANGE_NAME).execute()
         values = result.get('values', [])
         
         if not values:
