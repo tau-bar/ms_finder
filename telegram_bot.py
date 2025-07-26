@@ -83,6 +83,7 @@ def get_nearest_musollah(update, lat, lon, count=1):
         
         return update.message.reply_text(
             f'<b>{closest["name"]}</b>\n'
+            f'<b>Type:</b> {closest.get("type", "Musollah")}\n'
             f'<b>Distance:</b> {distance:.2f} kilometers\n\n'
             f'<b>Directions:</b>\n{directions}\n\n'
             f'<b>Additional Info:</b>\n{details}\n\n'
@@ -106,6 +107,7 @@ def get_nearest_musollah(update, lat, lon, count=1):
             
             response_text += (
                 f'<b>{i}. {location["name"]}</b>\n'
+                f'<b>Type:</b> {location.get("type", "Musollah")}\n'
                 f'<b>Distance:</b> {location["distance"]:.2f} kilometers\n\n'
                 f'<b>Directions:</b>\n{directions}\n\n'
                 f'<b>Additional Info:</b>\n{details}\n\n'

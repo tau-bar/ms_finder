@@ -47,14 +47,16 @@ def fetch_api_locations() -> List[Dict[str, Any]]:
                 lon = float(item.get('Longitude', 0))
                 
                 # Create location dictionary with the same structure as sheets_service
+                name = f"{item.get('Place', 'Unknown')}"
                 location = {
-                    "name": f"{item.get('Place', 'Unknown')} ({item.get('Type', 'Musollah')})",
+                    "name": name,
                     "lat": lat,
                     "lon": lon,
                     "directions": item.get('LocationIn', '') + '\n' + item.get('Address', ''),
                     "details": item.get('Details', ''),
+                    "type": item.get('Type', 'Musollah')
                     # Construct Google Maps link
-                    "google_maps": f"https://www.google.com/maps/search/?api=1&query={lat},{lon}",
+                    # "google_maps": f"https://www.google.com/maps/search/?api=1&query={name.replace(" ", "+")},{lat},{lon}",
                 }
                 
                 locations.append(location)
