@@ -34,15 +34,14 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         f'Tap the attachment icon (paperclip), select "Location", and send your current location 📍.'
     )
 
-def get_nearest_musollah(update, lat, lon):
+def get_nearest_musollah_text(lat, lon):
     # Fetch locations from Google Sheets
     locations = fetch_locations()
     
     # If no locations are found, inform the user
     if not locations:
-        return update.message.reply_text(
-            "Sorry, I couldn't retrieve the musollah locations at the moment. Please try again later.",
-            parse_mode=constants.ParseMode.HTML
+        return (
+            "Sorry, I couldn't retrieve the musollah locations at the moment. Please try again later."
         )
     
     # Find the closest musollah
@@ -63,24 +62,26 @@ def get_nearest_musollah(update, lat, lon):
     details = closest.get("details")
     details_text = f'<b>Additional Info:</b>\n{details}\n\n' if details else ''
 
-    return update.message.reply_text(
+    return (
         f'<b>{closest["name"]}</b>\n'
         f'<b>Distance:</b> {distance:.2f} kilometers\n\n'
         f'<b>Directions:</b>\n{closest["directions"]}\n\n'
         f'{details_text}'
-        f'{navigate_text}',
-        parse_mode=constants.ParseMode.HTML
+        f'{navigate_text}'
     )
 
 async def location_pindrop_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    loading_msg = await update.message.reply_text("Finding the nearest musollah...⏳")
     user_location = update.message.location
     latitude = user_location.latitude
     longitude = user_location.longitude
-    await get_nearest_musollah(update, latitude, longitude)
+    final_text = get_nearest_musollah_text(latitude, longitude)
+    await loading_msg.edit_text(final_text, parse_mode=constants.ParseMode.HTML)
 
 async def location_postal_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    loading_msg = await update.message.reply_text("Finding the nearest musollah...⏳")
     if not context.args or len(context.args[0]) != 6 or not context.args[0].isdigit():
-        await update.message.reply_text(f"Please provide a valid 6-digit Singapore postal code. Example: /{CMD_LOCATION} 119077")
+        await loading_msg.edit_text(f"Please provide a valid 6-digit Singapore postal code. Example: /{CMD_LOCATION} 119077")
         return
 
     postal_code = context.args[0]
@@ -90,15 +91,16 @@ async def location_postal_handler(update: Update, context: ContextTypes.DEFAULT_
         data = response.json()
         results = data.get('results', [])
         if not results:
-            await update.message.reply_text("Postal code not found. Please check and try again.")
+            await loading_msg.edit_text("Postal code not found. Please check and try again.")
             return
         lat = float(results[0]['LATITUDE'])
         lon = float(results[0]['LONGITUDE'])
     except Exception as e:
-        await update.message.reply_text("Error looking up postal code. Please try again later.")
+        await loading_msg.edit_text("Error looking up postal code. Please try again later.")
         return
 
-    await get_nearest_musollah(update, lat, lon)
+    final_text = get_nearest_musollah_text(lat, lon)
+    await loading_msg.edit_text(final_text, parse_mode=constants.ParseMode.HTML)
 
 def create_bot_app():
     environment = os.getenv("ENVIRONMENT", "dev").lower()
