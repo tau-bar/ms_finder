@@ -4,8 +4,9 @@ from dotenv import load_dotenv
 from telegram import Update, constants
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, MessageHandler, filters
 from geopy.distance import geodesic
-from musollah_locations import locations
 from datetime import datetime
+from sheets_service import fetch_locations
+from constants import CMD_HELLO, CMD_START, CMD_HELP, CMD_LOCATION
 
 load_dotenv()
 
@@ -29,12 +30,28 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     )
 
 def get_nearest_musollah(update, lat, lon):
+    # Fetch locations from Google Sheets
+    locations = fetch_locations()
+    
+    # If no locations are found, inform the user
+    if not locations:
+        return update.message.reply_text(
+            "Sorry, I couldn't retrieve the musollah locations at the moment. Please try again later.",
+            parse_mode=constants.ParseMode.HTML
+        )
+    
+    # Find the closest musollah
     closest = min(
         locations,
         key=lambda loc: geodesic((lat, lon), (loc["lat"], loc["lon"])).kilometers
     )
     distance = geodesic((lat, lon), (closest["lat"], closest["lon"])).kilometers
-    gmaps_link = f'https://www.google.com/maps/dir/?api=1&destination={closest["name"].replace(" ", "+")}@{closest["lat"]},{closest["lon"]}'
+    
+    # Use the Google Maps link from the data if available, otherwise construct it
+    if "google_maps" in closest and closest["google_maps"]:
+        gmaps_link = closest["google_maps"]
+    else:
+        gmaps_link = f'https://www.google.com/maps/dir/?api=1&destination={closest["name"].replace(" ", "+")}@{closest["lat"]},{closest["lon"]}'
 
     return update.message.reply_text(
         f'<b>{closest["name"]}</b>\n'
@@ -53,11 +70,11 @@ async def location_pindrop_handler(update: Update, context: ContextTypes.DEFAULT
 
 async def location_postal_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if not context.args or len(context.args[0]) != 6 or not context.args[0].isdigit():
-        await update.message.reply_text("Please provide a valid 6-digit Singapore postal code. Example: /location 119077")
+        await update.message.reply_text(f"Please provide a valid 6-digit Singapore postal code. Example: /{CMD_LOCATION} 119077")
         return
 
     postal_code = context.args[0]
-    url = f"https://developers.onemap.sg/commonapi/search?searchVal={postal_code}&returnGeom=Y&getAddrDetails=Y"
+    url = f"https://www.onemap.gov.sg/api/common/elastic/search?searchVal={postal_code}&returnGeom=Y&getAddrDetails=N"
     try:
         response = requests.get(url)
         data = response.json()
@@ -87,10 +104,10 @@ def create_bot_app():
 
     app = ApplicationBuilder().token(token).build()
 
-    app.add_handler(CommandHandler("hello", hello))
-    app.add_handler(CommandHandler("start", start_command))
-    app.add_handler(CommandHandler("help", help_command))
-    app.add_handler(CommandHandler("help", location_postal_handler))
+    app.add_handler(CommandHandler(CMD_HELLO, hello))
+    app.add_handler(CommandHandler(CMD_START, start_command))
+    app.add_handler(CommandHandler(CMD_HELP, help_command))
+    app.add_handler(CommandHandler(CMD_LOCATION, location_postal_handler))
     app.add_handler(MessageHandler(filters.LOCATION, location_pindrop_handler))
 
     return app

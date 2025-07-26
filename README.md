@@ -60,6 +60,14 @@ The bot can receive location data shared by users and find the closest predefine
 2. Identify the closest location
 3. Respond with the name of the closest location and the distance in kilometers
 
+### Google Sheets Integration
+The bot now retrieves location data from a Google Sheets spreadsheet instead of using hard-coded values. This allows for easier management and updating of location data without modifying the code.
+
+To set up the Google Sheets integration:
+1. Follow the instructions in the `GOOGLE_SHEETS_SETUP.md` file
+2. Create a public spreadsheet with columns for Name, Latitude, Longitude, Directions, and Details
+3. Update your `.env` file with your Google Sheets API key and spreadsheet ID
+
 ## Dependencies
 
 This bot requires the following dependencies:
@@ -68,5 +76,6 @@ This bot requires the following dependencies:
 - `pytz`: Required for timezone handling with the APScheduler component used by python-telegram-bot
 - `geopy`: Used for calculating distances between geographical coordinates
 - `python-dotenv`: Used for loading environment variables from a .env file
+- `google-api-python-client`: Used for Google Sheets API integration with API key authentication
 
 All dependencies are listed in the `requirements.txt` file.
