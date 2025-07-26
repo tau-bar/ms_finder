@@ -52,21 +52,39 @@
 
 ### Commands
 - `/hello`: Greets the user with their first name
+- `/start`: Displays a welcome message and instructions
 - `/help`: Displays help information about available commands
+- `/location <postal_code>`: Finds the nearest prayer space using a Singapore postal code
+- `/nearest <number>`: Finds multiple nearest prayer spaces (up to 5)
 
 ### Location Sharing
-The bot can receive location data shared by users and find the closest predefined location from its database. When a user shares their location, the bot will:
+The bot can receive location data shared by users and find the closest predefined locations from its database. When a user shares their location, the bot will:
 1. Calculate the distance to each predefined location
-2. Identify the closest location
-3. Respond with the name of the closest location and the distance in kilometers
+2. Identify the closest location(s)
+3. Respond with details including name, distance, directions, and a Google Maps link
 
-### Google Sheets Integration
-The bot now retrieves location data from a Google Sheets spreadsheet instead of using hard-coded values. This allows for easier management and updating of location data without modifying the code.
+#### Finding Multiple Nearby Locations
+Users can find multiple nearby prayer spaces using the `/nearest` command:
+1. Send `/nearest` followed by a number (e.g., `/nearest 3`) - maximum 5 locations can be shown
+2. Share your location when prompted
+3. The bot will respond with the specified number of nearest locations, sorted by distance
+
+### Location Data Sources
+
+#### Google Sheets Integration
+The bot retrieves location data from a Google Sheets spreadsheet. This allows for easier management and updating of location data without modifying the code.
 
 To set up the Google Sheets integration:
 1. Follow the instructions in the `GOOGLE_SHEETS_SETUP.md` file
-2. Create a public spreadsheet with columns for Name, Latitude, Longitude, Directions, and Details
+2. Create a public spreadsheet with columns for Name, Latitude, Longitude, Directions, Details, and Google Maps link
 3. Update your `.env` file with your Google Sheets API key and spreadsheet ID
+
+#### Musollah API Integration
+The bot also fetches location data from the Musollah API, providing additional prayer spaces beyond those in your spreadsheet.
+
+To set up the Musollah API integration:
+1. Obtain an API key for the Musollah API
+2. Add the API key to your `.env` file as `MUSOLLAH_API_KEY=your_key_here`
 
 ## Dependencies
 
@@ -77,5 +95,6 @@ This bot requires the following dependencies:
 - `geopy`: Used for calculating distances between geographical coordinates
 - `python-dotenv`: Used for loading environment variables from a .env file
 - `google-api-python-client`: Used for Google Sheets API integration with API key authentication
+- `requests`: Used for making HTTP requests to the Musollah API
 
 All dependencies are listed in the `requirements.txt` file.
