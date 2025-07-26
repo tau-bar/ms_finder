@@ -54,7 +54,7 @@ def fetch_api_locations() -> List[Dict[str, Any]]:
                     "directions": item.get('LocationIn', '') + '\n' + item.get('Address', ''),
                     "details": item.get('Details', ''),
                     # Construct Google Maps link
-                    "google_maps": f"https://www.google.com/maps/dir/?api=1&destination={lat},{lon}",
+                    "google_maps": f"https://www.google.com/maps/search/?api=1&query={lat},{lon}",
                 }
                 
                 locations.append(location)

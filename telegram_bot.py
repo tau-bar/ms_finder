@@ -75,7 +75,7 @@ def get_nearest_musollah(update, lat, lon, count=1):
         if "google_maps" in closest and closest["google_maps"]:
             gmaps_link = closest["google_maps"]
         else:
-            gmaps_link = f'https://www.google.com/maps/dir/?api=1&destination={closest["name"].replace(" ", "+")}@{closest["lat"]},{closest["lon"]}'
+            gmaps_link = f'https://www.google.com/maps/search/?api=1&query={closest["lat"]},{closest["lon"]}'
         
         # Safely get directions and details, providing defaults if missing
         directions = closest.get("directions", "No directions available")
@@ -86,7 +86,7 @@ def get_nearest_musollah(update, lat, lon, count=1):
             f'<b>Distance:</b> {distance:.2f} kilometers\n\n'
             f'<b>Directions:</b>\n{directions}\n\n'
             f'<b>Additional Info:</b>\n{details}\n\n'
-            f'<b>Navigate:</b> <a href="{gmaps_link}">Open in Google Maps</a>',
+            f'<b>View on Map:</b> <a href="{gmaps_link}">Open in Google Maps</a>',
             parse_mode=constants.ParseMode.HTML
         )
     else:
@@ -98,7 +98,7 @@ def get_nearest_musollah(update, lat, lon, count=1):
             if "google_maps" in location and location["google_maps"]:
                 gmaps_link = location["google_maps"]
             else:
-                gmaps_link = f'https://www.google.com/maps/dir/?api=1&destination={location["name"].replace(" ", "+")}@{location["lat"]},{location["lon"]}'
+                gmaps_link = f'https://www.google.com/maps/search/?api=1&query={location["lat"]},{location["lon"]}'
             
             # Safely get directions and details, providing defaults if missing
             directions = location.get("directions", "No directions available")
@@ -109,7 +109,7 @@ def get_nearest_musollah(update, lat, lon, count=1):
                 f'<b>Distance:</b> {location["distance"]:.2f} kilometers\n\n'
                 f'<b>Directions:</b>\n{directions}\n\n'
                 f'<b>Additional Info:</b>\n{details}\n\n'
-                f'<b>Navigate:</b> <a href="{gmaps_link}">Open in Google Maps</a>\n\n\n'
+                f'<b>View on Map:</b> <a href="{gmaps_link}">Open in Google Maps</a>\n\n\n'
             )
         
         return update.message.reply_text(
