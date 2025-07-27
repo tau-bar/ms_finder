@@ -9,3 +9,5 @@ CMD_HELLO = "hello"      # Simple greeting command
 CMD_START = "start"      # Initial welcome command
 CMD_HELP = "help"        # Help information command
 CMD_LOCATION = "location" # Location by postal code command
+CMD_NEAREST = "nearest"  # Command to get multiple nearest locations
+CMD_FEEDBACK = "feedback" # Command to send feedback to developers
