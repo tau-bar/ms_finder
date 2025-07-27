@@ -102,7 +102,8 @@ def _format_location_details(location, index=None):
         directions_line = f'<b>Directions:</b> {location.get("directions")}\n'
     
     # Additional details
-    details_lines = f'<b>Additional Info:</b> {details}' if details else ""
+    details = location.get("details", "")
+    details_lines = f'<b>Additional Info:</b> {details}' if details and details.strip() else ""
     
     return name + address_line + distance_line + directions_line + details_lines
 
