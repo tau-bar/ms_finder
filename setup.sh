@@ -34,7 +34,7 @@ if [ ! -f ".env" ]; then
     echo "Creating .env file for bot configuration..."
     echo "Please enter your Telegram Bot Token (from @BotFather):"
     read -r token
-    echo "TELEGRAM_BOT_TOKEN=$token" > .env
+    echo "TELEGRAM_BOT_TOKEN_PROD=$token" > .env
     echo ".env file created successfully!"
 else
     echo ""
