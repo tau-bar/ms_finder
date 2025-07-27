@@ -31,7 +31,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         "• Select \"Location\"\n"
         "• Share your current location\n\n"
         "I'll find the nearest musollah with directions! 🧭\n\n"
-        "💡 <b>Pro tip:</b> Use /{} followed by a number (e.g., /{} 3) to find multiple nearby prayer spaces.".format(CMD_NEAREST, CMD_NEAREST),
+        "💡 <b>Pro tip:</b> Use /{} to find multiple nearby prayer spaces.".format(CMD_NEAREST),
         parse_mode=constants.ParseMode.HTML
     )
 
