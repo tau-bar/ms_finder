@@ -52,9 +52,10 @@ def fetch_api_locations() -> List[Dict[str, Any]]:
                     "name": name,
                     "lat": lat,
                     "lon": lon,
-                    "directions": item.get('LocationIn', '') + '\n' + item.get('Address', ''),
+                    "address": item.get('Address', ''),
                     "details": item.get('Details', ''),
-                    "type": item.get('Type', 'Musollah')
+                    "type": item.get('Type', 'Musollah'),
+                    "directions": item.get('LocationIn', ''),
                     # Construct Google Maps link
                     # "google_maps": f"https://www.google.com/maps/search/?api=1&query={name.replace(" ", "+")},{lat},{lon}",
                 }

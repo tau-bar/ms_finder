@@ -5,6 +5,7 @@ from telegram import Update, constants
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, MessageHandler, filters, ConversationHandler
 from geopy.distance import geodesic
 from datetime import datetime
+import pytz
 
 from database_service import init_database, log_user_to_postgres
 from location_service import fetch_all_locations
@@ -54,6 +55,58 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         parse_mode=constants.ParseMode.HTML
     )
 
+def _get_gmaps_link(location):
+    """Extract or generate Google Maps link from location data."""
+    if "google_maps" in location and location["google_maps"]:
+        return location["google_maps"]
+    elif "lat" in location and "lon" in location:
+        return f"https://www.google.com/maps/search/?api=1&query={location['lat']},{location['lon']}"
+    return ''
+
+def _format_location_details(location, index=None):
+    """Format the details of a location for display.
+    
+    Args:
+        location: The location data dictionary
+        index: Optional index for numbered lists (used in multiple locations display)
+        
+    Returns:
+        Formatted location details as HTML text
+    """
+    # Basic location information
+    name_prefix = f"{index}. " if index is not None else ""
+    name = f'<b>{name_prefix}{location["name"]}</b>\n'
+    if (not location["type"] or location["type"].lower() == "musollah") and "musollah" not in location["name"].lower():
+        name = f'<b>{name_prefix}{location["name"]} Musollah</b>\n'
+    
+    # Address and Google Maps link
+    gmaps_link = _get_gmaps_link(location)
+    address_line = ""
+    if "address" in location and location["address"]:
+        if gmaps_link:
+            address_line = f'<b>Address:</b> {location["address"]} (<a href="{gmaps_link}">Google Maps</a>)\n'
+        else:
+            address_line = f'<b>Address:</b> {location["address"]}\n'
+    elif gmaps_link:
+        address_line = f'<b>Address:</b> <a href="{gmaps_link}">Google Maps</a>\n'
+    
+    # Distance
+    distance_line = f'<b>Distance:</b> {location["distance"]:.2f} kilometers\n'
+    
+    # Directions (only if video guide is available)
+    video_guide = location.get("guide", "")
+    directions_line = ""
+    if video_guide:
+        directions_line = f'<b>Directions:</b> <a href="{video_guide}">Directional Video</a>\n'
+    elif location.get("directions"):
+        directions_line = f'<b>Directions:</b> {location.get("directions")}\n'
+    
+    # Additional details
+    details = location.get("details", "No additional information available")
+    details_lines = f'<b>Additional Info:</b>\n{details}'
+    
+    return name + address_line + distance_line + directions_line + details_lines
+
 def get_nearest_musollah_text(lat, lon, count=1):
     # Fetch locations from all sources (Google Sheets and API)
     locations = fetch_all_locations()
@@ -75,56 +128,16 @@ def get_nearest_musollah_text(lat, lon, count=1):
     nearest_locations = sorted_locations[:count]
     
     if count == 1:
-        # Single location response (original behavior)
-        closest = nearest_locations[0]
-        print("CLOSEST", closest)
-        distance = closest['distance']
-        
-        # Use the Google Maps link from the data if available, otherwise construct it
-        gmaps_link = ''
-        if "google_maps" in closest and closest["google_maps"]:
-            gmaps_link = closest["google_maps"]
-        
-        # Safely get directions and details, providing defaults if missing
-        directions = closest.get("directions", "No directions available")
-        details = closest.get("details", "No additional information available")
-        navigate_text = f'<b>Navigate:</b> <a href="{gmaps_link}">Open in Google Maps</a>' if gmaps_link else ''
-        details_text = f'<b>Additional Info:</b>\n{details}\n\n' if details else ''
-        
-        return (
-            f'<b>{closest["name"]}</b>\n'
-            f'<b>Type:</b> {closest.get("type", "Musollah")}\n'
-            f'<b>Distance:</b> {distance:.2f} kilometers\n\n'
-            f'<b>Directions:</b>\n{directions}\n\n'
-            f'<b>Additional Info:</b>\n{details}\n\n'
-            f'<b>Navigate:</b> <a href="{gmaps_link}">Open in Google Maps</a>'
-        )
+        # Single location response
+        return _format_location_details(nearest_locations[0])
     else:
         # Multiple locations response
         response_text = f'<b>🕌 {count} Nearest Prayer Spaces:</b>\n\n'
         
         for i, location in enumerate(nearest_locations, 1):
-            # Use the Google Maps link from the data if available, otherwise construct it
-            gmaps_link = ''
-            if "google_maps" in location and location["google_maps"]:
-                gmaps_link = location["google_maps"]
-            
-            
-            # Safely get directions and details, providing defaults if missing
-            directions = location.get("directions", "No directions available")
-            details = location.get("details", "No additional information available")
-
-            navigate_text = f'<b>Navigate:</b> <a href="{gmaps_link}">Open in Google Maps</a>' if gmaps_link else ''
-            details_text = f'<b>Additional Info:</b>\n{details}\n\n' if details else ''
-            
-            response_text += (
-                f'<b>{i}. {location["name"]}</b>\n'
-                f'<b>Type:</b> {location.get("type", "Musollah")}\n'
-                f'<b>Distance:</b> {location["distance"]:.2f} kilometers\n\n'
-                f'<b>Directions:</b>\n{directions}\n\n'
-                f'{details_text}'
-                f'{navigate_text}'
-            )
+            response_text += _format_location_details(location, i)
+            if i < len(nearest_locations):  # Add separator between locations except after the last one
+                response_text += "\n\n"
         
         return response_text
 
@@ -270,7 +283,8 @@ async def process_feedback(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     message_text = update.message.text
     
     # Format the feedback message with user info and timestamp
-    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    singapore_tz = pytz.timezone('Asia/Singapore')  # GMT+8 timezone
+    current_time = datetime.now(singapore_tz).strftime("%H:%M %d/%m/%Y")
     feedback_formatted = (
         f"📩 <b>New Feedback</b>\n\n"
         f"<b>From:</b> {user.first_name} {user.last_name if user.last_name else ''}\n"
