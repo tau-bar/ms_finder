@@ -17,6 +17,17 @@ bot_app = None
 load_dotenv()
 PROD_URL = os.getenv("PROD_URL")
 
+async def send_message_to_devs(message: str):
+    developer_group_id = os.getenv("DEVELOPER_GROUP_ID")
+        
+        if developer_group_id:
+            try:
+                await context.bot.send_message(
+                    chat_id=developer_group_id,
+                    text=message,
+                    parse_mode=constants.ParseMode.HTML
+                )
+
 async def keep_alive():
     """Keep the service alive by making periodic requests"""
     while True:
@@ -25,8 +36,19 @@ async def keep_alive():
             async with aiohttp.ClientSession() as session:
                 async with session.get(PROD_URL + "health") as response:
                     logger.info(f"Keep-alive ping: {response.status} at {datetime.now()}")
+                    if response.status != 200:
+                        await send_message_to_devs(
+                            "🚨 <b>Server health check failed!</b>\n"
+                            "@khaleeluu @tau_bar Pls check the server."
+                        )
+
         except Exception as e:
             logger.error(f"Keep-alive error: {e}")
+            await send_message_to_devs(
+                            "🚨 <b>Server may be DOWN!</b>\n"
+                            f"Error during keep-alive ping:\n<code>{e}</code>\n"
+                            "@khaleeluu @tau_bar Pls check the server."
+                        )
 
 @app.on_event("startup")
 async def startup_event():
