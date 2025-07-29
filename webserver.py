@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request
-from telegram import Update
+from telegram import Update, constants
 from telegram_bot import create_bot_app
 import os
 import logging
@@ -19,14 +19,16 @@ PROD_URL = os.getenv("PROD_URL")
 
 async def send_message_to_devs(message: str):
     developer_group_id = os.getenv("DEVELOPER_GROUP_ID")
-        
+    
     if developer_group_id:
         try:
-            await context.bot.send_message(
+            await bot_app.bot.send_message(
                 chat_id=developer_group_id,
                 text=message,
                 parse_mode=constants.ParseMode.HTML
             )
+        except Exception as e:
+            logger.error(f"Failed to send alert to developers: {e}", exc_info=True)
 
 async def keep_alive():
     """Keep the service alive by making periodic requests"""
