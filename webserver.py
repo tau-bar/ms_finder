@@ -20,13 +20,13 @@ PROD_URL = os.getenv("PROD_URL")
 async def send_message_to_devs(message: str):
     developer_group_id = os.getenv("DEVELOPER_GROUP_ID")
         
-        if developer_group_id:
-            try:
-                await context.bot.send_message(
-                    chat_id=developer_group_id,
-                    text=message,
-                    parse_mode=constants.ParseMode.HTML
-                )
+    if developer_group_id:
+        try:
+            await context.bot.send_message(
+                chat_id=developer_group_id,
+                text=message,
+                parse_mode=constants.ParseMode.HTML
+            )
 
 async def keep_alive():
     """Keep the service alive by making periodic requests"""
