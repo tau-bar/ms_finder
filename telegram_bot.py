@@ -30,8 +30,8 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         "• Tap the attachment icon (📎)\n"
         "• Select \"Location\"\n"
         "• Share your current location\n\n"
-        "I'll find the nearest musollah with directions! 🧭\n\n"
-        "💡 <b>Pro tip:</b> Use /{} to find multiple nearby prayer spaces.".format(CMD_NEAREST),
+        "I'll find the nearest musollah(s) with directions! 🧭\n\n"
+        "💡 <b>Pro tip:</b> For better accuracy, enable <b>precise location</b> in your phone settings.",
         parse_mode=constants.ParseMode.HTML
     )
 
