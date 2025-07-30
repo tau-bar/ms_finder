@@ -46,6 +46,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         f'/{CMD_LOCATION} - Find nearest prayer space using a postal code\n'
         f'/{CMD_NEAREST} - Find multiple nearest prayer spaces\n'
         f'/{CMD_FEEDBACK} - Send feedback to the developers\n\n'
+        "💡 <b>Pro tip:</b> For better accuracy, enable <b>precise location</b> in your phone settings.\n\n"
         f'<b>How to use:</b>\n\n'
         f'• To find the nearest prayer space, tap the attachment icon (📎), select "Location", and share your current location.\n\n'
         f'• To find the nearest prayer space using a postal code, use /{CMD_LOCATION} and follow the prompts to enter a 6-digit Singapore postal code.\n\n'
