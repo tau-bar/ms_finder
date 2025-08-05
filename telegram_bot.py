@@ -36,6 +36,8 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     )
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    user = update.effective_user
+    log_user_to_supabase(user)
     await update.message.reply_text(
         f'To find the nearest musollah 🕌:\n\n'
         f'Tap the attachment icon (paperclip), select "Location", and send your current location 📍.\n\n\n'
@@ -143,6 +145,8 @@ def get_nearest_musollah_text(lat, lon, count=1):
         return response_text
 
 async def location_pindrop_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    user = update.effective_user
+    log_user_to_supabase(user)
     loading_msg = await update.message.reply_text("Finding the nearest musollah...⏳")
     user_location = update.message.location
     latitude = user_location.latitude
@@ -161,6 +165,8 @@ async def location_pindrop_handler(update: Update, context: ContextTypes.DEFAULT
         await loading_msg.edit_text(final_text, parse_mode=constants.ParseMode.HTML)
 
 async def location_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    user = update.effective_user
+    log_user_to_supabase(user)
     """Start the conversation flow for the /location command."""
     user = update.effective_user
     log_user_to_supabase(user)
@@ -174,6 +180,8 @@ async def location_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     return WAITING_FOR_LOCATION
 
 async def process_postal_code(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    user = update.effective_user
+    log_user_to_supabase(user)
     """Process the postal code sent by the user."""
     loading_msg = await update.message.reply_text("Finding the nearest musollah...⏳")
     postal_code = update.message.text.strip()
@@ -215,6 +223,8 @@ async def cancel_location(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     return ConversationHandler.END
 
 async def nearest_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    user = update.effective_user
+    log_user_to_supabase(user)
     """Start the conversation flow for the /nearest command."""
     user = update.effective_user
     log_user_to_supabase(user)
@@ -267,6 +277,8 @@ async def cancel_nearest(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     return ConversationHandler.END
 
 async def feedback_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    user = update.effective_user
+    log_user_to_supabase(user)
     """Handle the /feedback command to start the feedback conversation flow."""
     user = update.effective_user
     log_user_to_supabase(user)
