@@ -7,7 +7,7 @@ from geopy.distance import geodesic
 from datetime import datetime
 import pytz
 
-from database_service import init_database, log_user_to_postgres
+from database_service import init_database, log_user_to_supabase
 from location_service import fetch_all_locations
 from constants import CMD_HELLO, CMD_START, CMD_HELP, CMD_LOCATION, CMD_NEAREST, CMD_FEEDBACK
 
@@ -23,7 +23,7 @@ async def hello(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user = update.effective_user
-    log_user_to_postgres(user)
+    log_user_to_supabase(user)
     await update.message.reply_text(
         "🕌 Ready to help you find prayer spaces!\n\n"
         "📍 Send your location to get started:\n"
@@ -163,7 +163,7 @@ async def location_pindrop_handler(update: Update, context: ContextTypes.DEFAULT
 async def location_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Start the conversation flow for the /location command."""
     user = update.effective_user
-    log_user_to_postgres(user)
+    log_user_to_supabase(user)
     
     await update.message.reply_text(
         "📍 Please send me a 6-digit Singapore postal code to find the nearest prayer space.\n\n"
@@ -217,7 +217,7 @@ async def cancel_location(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 async def nearest_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Start the conversation flow for the /nearest command."""
     user = update.effective_user
-    log_user_to_postgres(user)
+    log_user_to_supabase(user)
     
     await update.message.reply_text(
         "🔍 How many nearest prayer spaces would you like to see? (maximum 5)\n\n"
@@ -269,7 +269,7 @@ async def cancel_nearest(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 async def feedback_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Handle the /feedback command to start the feedback conversation flow."""
     user = update.effective_user
-    log_user_to_postgres(user)
+    log_user_to_supabase(user)
     
     await update.message.reply_text(
         "📝 We'd love to hear your feedback! Please type your message below.\n\n"
